@@ -1,7 +1,6 @@
 import torch.nn as nn
 import torch
 import torch.optim as optim
-from tqdm import tqdm
 import wandb
 from datetime import datetime
 import os
@@ -11,15 +10,10 @@ import numpy as np
 
 delfos_path = pathlib.Path(__name__).resolve().parent.parent
 sys.path.append(str(delfos_path))
-from utils import *
-from data.transformations import transform_train, transform_test
-from data.load_data import create_dataloaders
-from data.multimodal_dataloader import DelfosDataset
-from img_script.get_img_model import ImageModel
-from tabular_script.get_tab_model import TabularModel
-from multimodal_script.get_multimodal_model import MultimodalModel
-from multimodal_script.train_multimodal import train_one_epoch
-from multimodal_script.evaluate_multimodal import evaluate
+
+from Cardium.multimodal_script.multimodal_models.get_multimodal_model import MultimodalModel
+from train import train_one_epoch
+from evaluate import evaluate
 from utils import *
 
 # Parse the arguments
@@ -45,7 +39,10 @@ def main(args):
             "model": "multimodal_kfold"})
 
     folds = args.folds
-    best_f1_folds = []
+    test_metrics = {"F1 Score": [],
+                    "Accuracy": [], 
+                    "Precision": [],
+                    "Recall": []}
 
     for fold in range(folds):
         print(f"\n=== Fold {fold + 1}/{folds} ===\n")
@@ -132,7 +129,7 @@ def main(args):
 
         # --- Training Loop ---
         best_f1 = 0.0
-        best_threshold = 0.5
+        threshold = 0.5
 
         save_path = os.path.join("multimodal_checkpoints", exp_name, f"fold{fold}_best_model.pth")
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
@@ -144,9 +141,9 @@ def main(args):
             train_one_epoch(multimodal_model, train_loader, criterion, optimizer, epoch, device, fold, exp_name, args)
 
             # Validate
-            best_threshold, best_f1, _, _ = evaluate(
+            best_f1, _, _, _ = evaluate(
                 multimodal_model, test_loader, criterion, device, fold,
-                mode="val", save_path=save_path, best_f1=best_f1, best_threshold=best_threshold
+                mode="val", save_path=save_path, best_f1=best_f1, threshold=threshold
             )
 
             print(f"Best F1 so far: {best_f1}")
@@ -155,18 +152,22 @@ def main(args):
         # --- Test phase ---
         print("Loading the best model for test evaluation...")
         multimodal_model.load_state_dict(torch.load(save_path))
-        f1_test = evaluate(multimodal_model, test_loader, criterion, device, fold, args, mode="test",
-                           best_threshold=best_threshold)
+        f1_test, accuracy_test, precision_test, recall_test = evaluate(multimodal_model, test_loader, criterion, 
+                                                                       device, fold, args, mode="test", threshold=threshold)
 
-        best_f1_folds.append(f1_test)
+        test_metrics["F1 Score"].append(f1_test)
+        test_metrics["Accuracy"].append(accuracy_test)
+        test_metrics["Precision"].append(precision_test)
+        test_metrics["Recall"].append(recall_test)
 
     # --- Summary ---
-    mean_f1 = np.mean(best_f1_folds)
-    std_f1 = np.std(best_f1_folds)
-    print(f"Average F1-Score: {mean_f1:.4f} ± {std_f1:.4f}")
-
-    wandb.log({"average_f1_score": mean_f1, "std_f1_score": std_f1})
-    wandb.finish()
+    metrics_summary = {key: {"mean": np.mean(values), "std": np.std(values)} for key, values in test_metrics.items()}
+    
+    print(f"Final average test metrics")
+    for metric, summary in metrics_summary.items():
+        print(f"{metric}: Mean = {summary['mean']:.4f}, Std = {summary['std']:.4f}")
+        wandb.log({f"Average {metric}": summary["mean"], f"Std {metric}": summary["std"]})
+        wandb.finish()
 
 
 if __name__ == "__main__":

@@ -8,7 +8,7 @@ import sys
 
 delfos_path = pathlib.Path(__name__).resolve().parent.parent
 sys.path.append(str(delfos_path))
-from get_metrics import *
+from utils import *
 
 def evaluate(
     model, 
@@ -19,7 +19,7 @@ def evaluate(
     mode: str = "val", 
     save_path: str = None, 
     best_f1: float = None, 
-    best_threshold: float = None
+    threshold: float = None
 ):
     """
     Evaluate the model at the patient level and compute metrics.
@@ -77,7 +77,7 @@ def evaluate(
     wandb.log({f"{mode.lower()}_loss": avg_loss})
 
     # --- 3. Compute patient-level metrics ---
-    f1, threshold = compute_patient_metrics(
+    f1, accuracy, precision, recall = compute_patient_metrics(
         y_score_patient=y_score_patient, 
         y_true_patient=y_true_patient,
         mode=mode,
@@ -87,9 +87,8 @@ def evaluate(
     # --- 4. Save best model during validation ---
     if mode.lower() == "val" and best_f1 is not None and f1 > best_f1:
         best_f1 = f1
-        best_threshold = threshold
         torch.save(model.state_dict(), save_path)
-        print(f"New best model saved with threshold {best_threshold:.4f} and F1 score: {best_f1:.4f}")
+        print(f"New best model saved with threshold {threshold:.4f} and F1 score: {best_f1:.4f}")
 
     # --- 5. Return results ---
-    return best_threshold, best_f1, f1, avg_loss if mode.lower() == "val" else f1
+    return best_f1, accuracy, precision, recall
