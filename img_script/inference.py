@@ -49,7 +49,6 @@ def main(args):
         device = "cuda" if torch.cuda.is_available() else "cpu"
         
         #Get image model
-        #"/home/dvegaa/DELFOS/MedViT/MedViT_models/2025-01-22-14-26-21/best_model.pth"
         img_model = ImageModel(args)
         img_model = img_model.build_model()
         img_model = img_model.to(device)
@@ -90,8 +89,5 @@ if __name__ == "__main__":
     args = get_main_parser()
     # Use the provided experiment name
     exp_name = args.exp_name
-    # Initialize wandb to track the experiment
-    #wandb.init(project=args.wandb_project, 
-    #        name=exp_name+"_demo")
     # Start the main function
     main(args)
