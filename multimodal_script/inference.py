@@ -13,6 +13,7 @@ from data.multimodal_dataloader import DelfosDataset
 from img_script.get_img_model import ImageModel
 from tabular_script.get_tab_model import TabularModel
 from Cardium.multimodal_script.multimodal_models.get_multimodal_model import MultimodalModel
+from Cardium.data.load_data import create_dataloaders
 from utils import *
 
 
@@ -44,7 +45,7 @@ def main(args):
         json_root = "/home/dvegaa/DELFOS/CARDIUM/dataset/delfos_clinical_data_woe_wnm_standarized_f_normalized.json"
 
         # Create data loaders
-        _, _, test_loader, _, _, _ = create_dataloaders(
+        _, test_loader = create_dataloaders(
             dataset_dir=dataset_path,
             json_root=json_root,
             dataset_class=DelfosDataset,

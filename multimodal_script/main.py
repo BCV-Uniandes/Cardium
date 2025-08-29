@@ -12,6 +12,7 @@ delfos_path = pathlib.Path(__name__).resolve().parent.parent
 sys.path.append(str(delfos_path))
 
 from Cardium.multimodal_script.multimodal_models.get_multimodal_model import MultimodalModel
+from Cardium.data.load_data import create_dataloaders
 from train import train_one_epoch
 from evaluate import evaluate
 from utils import *
@@ -58,7 +59,7 @@ def main(args):
         set_seed(42)
 
         # Create dataloaders
-        train_loader, _, test_loader, num_negatives, num_positives, _ = create_dataloaders(
+        train_loader, test_loader = create_dataloaders(
             dataset_dir=dataset_path,
             json_root=json_root,
             dataset_class=DelfosDataset,
@@ -69,8 +70,6 @@ def main(args):
             args=args,
             multimodal=True
         )
-
-        print(f"Num negatives: {num_negatives}, Num positives: {num_positives}")
 
         device = "cuda" if torch.cuda.is_available() else "cpu"
 
