@@ -48,7 +48,7 @@ def get_main_parser():
     parser.add_argument("--img_class_dropout", type=float, default=0.2, help="Path dropout to be used in multimodal models")
     ######################################### TABULAR MODEL ##############################################################################
     parser.add_argument("--tab_pretrain", type=str2bool, default=False, help="True for pretrained tabular model")
-    parser.add_argument("--tab_model", type=str, default="TabTransformer", help="whether to use TabTransformer")
+    parser.add_argument("--tab_model", type=str, default="TabEncoder", help="whether to use TabTransformer")
     parser.add_argument("--tab_feature_dim", type=int, default=128, help="Dimension of tabular features to be used in multimodal model")
     parser.add_argument("--tab_checkpoint", type=str, default="best_tab", help="Path to tabular model checkpoint")
     parser.add_argument("--tab_num_heads", type=int, default=8, help="Number of heads of the TransformerEncoder model")
