@@ -110,16 +110,16 @@ class TransformerDecoder(nn.Module):
         """
 
         # ----- Image features -----
-        # Extract image features (freeze dynamically if args.img_checkpoint is truthy) ---
-        with torch.no_grad() if self.args.img_checkpoint else torch.enable_grad():
+        # Extract features from the image model
+        with torch.no_grad():
             img_features = self.img_model(img_input)
 
         # Project to embed_dim
         img_features = self.img_proj(img_features).unsqueeze(0)
 
         # ----- Tabular features -----
-        # Extract tabular features (freeze dynamically if args.tab_checkpoint is truthy) ---
-        with torch.no_grad() if self.args.tab_checkpoint else torch.enable_grad():
+        # Extract features from the tabular model
+        with torch.no_grad():
             tab_features = self.tab_model(tab_input)
 
         # Project to embed_dim 

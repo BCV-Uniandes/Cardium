@@ -1,21 +1,15 @@
-import torch
 from tqdm import tqdm
 import wandb
-import numpy as np
-from torch.utils.data import DataLoader,  WeightedRandomSampler
-import matplotlib.pyplot as plt
-import os
 
-def train_one_epoch(
-    model: nn.Module,
-    train_loader: DataLoader,
-    criterion: nn.Module,
-    optimizer: torch.optim.Optimizer,
-    epoch: int,
-    device: torch.device,
-    fold: int,
-    args,
-) -> np.ndarray:
+def train_one_epoch(model,
+                    train_loader,
+                    criterion,
+                    optimizer,
+                    epoch,
+                    device,
+                    fold,
+                    args,
+):
     """
     Train the model for one epoch.
 
@@ -32,37 +26,46 @@ def train_one_epoch(
     Returns:
         logits (np.ndarray): Concatenated predictions for the entire epoch.
     """
+    
+    # Train the model for one epoch
     model.train()
+    
+    # Track the running loss
     running_loss = 0.0
-
     progress_bar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{args.num_epochs}", unit="batch")
 
+    # --- 1. Iterate over DataLoader ---
     for batch_idx, (inputs, targets) in enumerate(progress_bar):
+        # Move inputs and targets to the appropriate device
         img_data, tab_data = inputs[0].to(device), inputs[1].to(device)
         targets = targets.to(device).float()  # Ensure float for BCE/ regression
 
-        optimizer.zero_grad()
-
         # Forward pass
+        optimizer.zero_grad()
         outputs = model(img_data, tab_data)
+        
         # Squeeze outputs
         outputs = outputs.squeeze(1)
-
+        
+        # Compute the loss
         loss = criterion(outputs, targets)
+        
+        # Backpropagation
         loss.backward()
+        
+        # Update the model parameters 
         optimizer.step()
 
-        running_loss += loss.item()
-
         # Update progress bar with running loss
+        running_loss += loss.item()
         progress_bar.set_postfix({
             "Batch Loss": f"{loss.item():.4f}",
             "Avg Loss": f"{running_loss / (batch_idx + 1):.4f}"
-        })
+            })
 
     # Compute average loss for the epoch
     avg_loss = running_loss / len(train_loader)
-    print(f"Epoch [{epoch+1}/{args.num_epochs}], Average Loss: {avg_loss:.4f}")
+    print(f"Epoch [{epoch+1}/{args.num_epochs}], Train Loss: {avg_loss:.4f}")
 
     # Log to wandb
     wandb.log({

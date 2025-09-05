@@ -8,14 +8,15 @@ import pathlib
 import sys
 import numpy as np
 
-delfos_path = pathlib.Path(__name__).resolve().parent.parent
-sys.path.append(str(delfos_path))
+CARDIUM_path = pathlib.Path(__name__).resolve().parent.parent
+sys.path.append(str(CARDIUM_path))
 
-from Cardium.multimodal_script.multimodal_models.get_multimodal_model import MultimodalModel
-from Cardium.data.load_data import create_dataloaders
+from multimodal_script.multimodal_models.get_multimodal_model import MultimodalModel
+from data.load_multimodal_data import create_dataloaders
 from train import train_one_epoch
 from evaluate import evaluate
 from utils import *
+from data.transformations import transform_train, transform_test
 
 # Parse the arguments
 args = get_main_parser()
@@ -35,10 +36,10 @@ def main(args):
             entity="spared_v2", 
             name=exp_name)
 
-    config = wandb.config
-    wandb.log({"args": vars(args),
-            "model": "multimodal_kfold"})
+    wandb.log({"args": vars(args)})
 
+    ######################### TRAIN MODEL ###########################################
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     folds = args.folds
     test_metrics = {"F1 Score": [],
                     "Accuracy": [], 
@@ -49,19 +50,16 @@ def main(args):
         print(f"\n=== Fold {fold + 1}/{folds} ===\n")
 
         # Determine dataset paths
-        if args.trimester is None:
-            dataset_path = f"/home/dvegaa/DELFOS/CARDIUM/dataset/delfos_images_kfold/fold_{fold+1}"
-        else:
-            dataset_path = f"/home/dvegaa/DELFOS/CARDIUM/trimester_analisis/dataset_correct_trimesters/{args.trimester}_trimester/fold_{fold+1}"
-        json_root = "/home/dvegaa/DELFOS/CARDIUM/dataset/delfos_clinical_data_woe_wnm_standarized_f_normalized.json"
+        dataset_path = f"{args.image_folder_path}/fold_{fold+1}"
+        json_path = args.json_path
 
         # Set random seed for reproducibility
-        set_seed(42)
+        set_seed(args.seed)
 
         # Create dataloaders
         train_loader, test_loader = create_dataloaders(
             dataset_dir=dataset_path,
-            json_root=json_root,
+            json_root=json_path,
             dataset_class=DelfosDataset,
             transform_train=transform_train,
             transform_test=transform_test,
@@ -71,15 +69,12 @@ def main(args):
             multimodal=True
         )
 
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-
         # --- Build models ---
         # Image model
         img_model = ImageModel(args).build_model().to(device)
         if args.img_checkpoint is not None:
             print("Loading image model pretrained weights...")
-            image_checkpoint = os.path.join("/home/dvegaa/DELFOS/CARDIUM/img_script/image_checkpoints",
-                                            args.img_checkpoint, f"fold{fold}_best_model.pth")
+            image_checkpoint = os.path.join(args.img_checkpoint, f"fold{fold}_best_model.pth")
             checkpoint = torch.load(image_checkpoint, map_location=device, weights_only=True)
             img_model.load_state_dict(checkpoint, strict=False)
 
@@ -95,8 +90,7 @@ def main(args):
         tab_model = TabularModel(args).build_model().to(device)
         if args.tab_checkpoint is not None:
             print("Loading tabular model pretrained weights...")
-            tab_checkpoint = os.path.join("/home/dvegaa/DELFOS/CARDIUM/tabular_script/tabular_checkpoints",
-                                          args.tab_checkpoint, f"best_model_fold_{fold+1}.pth")
+            tab_checkpoint = os.path.join(args.tab_checkpoint, f"best_model_fold_{fold+1}.pth")
             checkpoint = torch.load(tab_checkpoint, map_location=device, weights_only=True)
             tab_model.load_state_dict(checkpoint, strict=False)
         tab_model.mlp = nn.Identity()
@@ -105,20 +99,12 @@ def main(args):
         multimodal_model = MultimodalModel(img_model=img_model, tab_model=tab_model, args=args).build_model().to(device)
         if args.multimodal_checkpoint is not None:
             print("Loading multimodal model pretrained weights...")
-            multi_checkpoint = os.path.join("/home/dvegaa/DELFOS/CARDIUM/multimodal_script/multimodal_checkpoints",
-                                            args.multimodal_checkpoint, f"fold{fold}_best_model.pth")
+            multi_checkpoint = os.path.join(args.multimodal_checkpoint, f"fold{fold}_best_model.pth")
             checkpoint = torch.load(multi_checkpoint, map_location=device, weights_only=True)
             multimodal_model.load_state_dict(checkpoint, strict=False)
 
         # --- Loss function ---
-        if args.loss_factor == 0:
-            loss_weights = None
-        else:
-            loss_weights = torch.tensor([num_negatives / num_positives], dtype=torch.float32).to(device)
-            if args.loss_factor > 1:
-                loss_weights = torch.tensor(args.loss_factor).to(device)
-            else:
-                loss_weights = loss_weights * args.loss_factor
+        loss_weights = torch.tensor(args.loss_factor).to(device)
 
         print(f"Loss weights: {loss_weights}")
         criterion = nn.BCEWithLogitsLoss(pos_weight=loss_weights).to(device)
@@ -139,8 +125,8 @@ def main(args):
             # Train one epoch
             train_one_epoch(multimodal_model, train_loader, criterion, optimizer, epoch, device, fold, exp_name, args)
 
-            # Validate
-            best_f1, _, _, _ = evaluate(
+            # Validates
+            best_f1, _, _, _, _ = evaluate(
                 multimodal_model, test_loader, criterion, device, fold,
                 mode="val", save_path=save_path, best_f1=best_f1, threshold=threshold
             )
@@ -151,7 +137,7 @@ def main(args):
         # --- Test phase ---
         print("Loading the best model for test evaluation...")
         multimodal_model.load_state_dict(torch.load(save_path))
-        f1_test, accuracy_test, precision_test, recall_test = evaluate(multimodal_model, test_loader, criterion, 
+        _, f1_test, accuracy_test, precision_test, recall_test = evaluate(multimodal_model, test_loader, criterion, 
                                                                        device, fold, args, mode="test", threshold=threshold)
 
         test_metrics["F1 Score"].append(f1_test)
@@ -166,7 +152,7 @@ def main(args):
     for metric, summary in metrics_summary.items():
         print(f"{metric}: Mean = {summary['mean']:.4f}, Std = {summary['std']:.4f}")
         wandb.log({f"Average {metric}": summary["mean"], f"Std {metric}": summary["std"]})
-        wandb.finish()
+    wandb.finish()
 
 
 if __name__ == "__main__":

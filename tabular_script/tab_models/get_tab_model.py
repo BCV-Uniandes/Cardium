@@ -27,8 +27,8 @@ class TabularModel:
             nn.Module: The constructed model.
         """
         if self.args.tab_model == "TabTransformer":
-            self.model = TabEncoder(num_features=self.args.num_features, dim_embedding=self.args.tab_feature_dim, num_heads=self.args.tab_num_heads, num_layers=self.args.tab_num_layers)     
+            self.model = TabEncoder(num_features=self.args.tab_num_features, dim_embedding=self.args.tab_feature_dim, num_heads=self.args.tab_num_heads, num_layers=self.args.tab_num_layers)     
         else:
-            raise ValueError(f"Unsupported model: {self.args.model}")
+            raise ValueError(f"Unsupported model: {self.args.tab_model}")
 
         return self.model

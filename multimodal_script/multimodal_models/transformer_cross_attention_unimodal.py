@@ -106,16 +106,16 @@ class TransformerCrossAttentionUnimodal(nn.Module):
         """
         
         # ----- Image features -----
-        # Extract features from the image model (frozen or trainable) ---
-        with torch.no_grad() if self.args.frozen else torch.enable_grad():
+        # Extract features from the image model
+        with torch.no_grad():
             img_features = self.img_model(img_input)
         
         # Project to embed_dim
         img_features = self.img_proj(img_features).unsqueeze(0)
 
         # ----- Tabular features -----
-        # Extract features from the tabular model (frozen or trainable) ---
-        with torch.no_grad() if self.args.frozen else torch.enable_grad():
+        # Extract features from the tabular model
+        with torch.no_grad():
             tab_features = self.tab_model(tab_input)
         
         # Project to embed_dim

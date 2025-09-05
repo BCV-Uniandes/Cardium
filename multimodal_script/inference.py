@@ -8,12 +8,12 @@ delfos_path = pathlib.Path(__name__).resolve().parent.parent
 sys.path.append(str(delfos_path))
 
 from data.transformations import transform_train, transform_test
-from data.load_data import create_dataloaders
+from data.load_multimodal_data import create_dataloaders
 from data.multimodal_dataloader import DelfosDataset
-from img_script.get_img_model import ImageModel
+from img_script.img_models.get_img_model import ImageModel
 from tabular_script.get_tab_model import TabularModel
-from Cardium.multimodal_script.multimodal_models.get_multimodal_model import MultimodalModel
-from Cardium.data.load_data import create_dataloaders
+from multimodal_script.multimodal_models.get_multimodal_model import MultimodalModel
+from data.load_multimodal_data import create_dataloaders
 from utils import *
 
 
@@ -34,17 +34,22 @@ def main(args):
     """
     
     # Prepare metrics storage
-    metrics_folds = {"precision": [], "recall": [], "f1-score": [], "roc auc": []}
+    metrics_folds = {"precision": [], 
+                     "recall": [], 
+                     "f1-score": [], 
+                     "accuracy": []}
     
+    # Set device
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
+    # Cross-validation
     for fold in range(args.folds):
-        print(f"Processing fold {fold + 1}")
-
+        print(f"Processing fold {fold}")
+        set_seed(42) 
         dataset_path = f"/home/dvegaa/DELFOS/CARDIUM/dataset/delfos_images_kfold/fold_{fold+1}" if not args.trimester else f"/home/dvegaa/DELFOS/CARDIUM/trimester_analisis/dataset_correct_trimesters/{args.trimester}_trimester/fold_{fold+1}"
         json_root = "/home/dvegaa/DELFOS/CARDIUM/dataset/delfos_clinical_data_woe_wnm_standarized_f_normalized.json"
 
-        # Create data loaders
+        # Create data loaders for the current fold
         _, test_loader = create_dataloaders(
             dataset_dir=dataset_path,
             json_root=json_root,
@@ -52,7 +57,6 @@ def main(args):
             transform_train=transform_train,
             transform_test=transform_test,
             batch_size=args.batch_size,
-            fold=fold,
             args=args,
             multimodal=True
         )
@@ -85,11 +89,7 @@ def main(args):
 
         # Inference
         y_true, y_score = inference_multimodal(multimodal_model, test_loader, device)
-        f1, accuracy, precision, recall = compute_patient_metrics(
-        y_score_patient=y_score, 
-        y_true_patient=y_true,
-        mode="test",
-        fold=fold)
+        f1, accuracy, precision, recall = compute_patient_metrics(y_score=y_score, y_true=y_true, mode="test", fold=fold)
 
         # Store metrics for this fold
         metrics_folds["precision"].append(precision)
