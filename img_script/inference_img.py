@@ -15,6 +15,7 @@ sys.path.append(str(delfos_path))
 from data.transformations import transform_train, transform_test
 from data.load_img_data import create_dataloaders
 from data.img_dataloader import DelfosDataset
+from data.dataloader import CardiumDataset
 from img_script.img_models.get_img_model import ImageModel
 from utils import *
 
@@ -42,12 +43,12 @@ def main(args):
         set_seed(42) 
         
         # Set the dataset path for the current fold
-        dataset_path = f"{args.data_path}/fold_{fold+1}"
-        
+        dataset_path = f"{args.image_folder_path}/fold_{fold+1}" # Without trimester separation
+
         # Create data loaders for the current fold
         _, test_loader = create_dataloaders(
             dataset_dir = dataset_path,
-            dataset_class=DelfosDataset,
+            dataset_class=CardiumDataset,
             transform_train=transform_train,
             transform_test=transform_test,
             batch_size=args.batch_size,

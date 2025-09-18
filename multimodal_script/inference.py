@@ -8,12 +8,11 @@ delfos_path = pathlib.Path(__name__).resolve().parent.parent
 sys.path.append(str(delfos_path))
 
 from data.transformations import transform_train, transform_test
-from data.load_multimodal_data import create_dataloaders
-from data.multimodal_dataloader import DelfosDataset
+from data.dataloader import CardiumDataset
 from img_script.img_models.get_img_model import ImageModel
-from tabular_script.get_tab_model import TabularModel
+from tabular_script.tab_models.get_tab_model import TabularModel
 from multimodal_script.multimodal_models.get_multimodal_model import MultimodalModel
-from data.load_multimodal_data import create_dataloaders
+from data.load_multimodal_data import create_multimodal_dataloaders
 from utils import *
 
 
@@ -46,25 +45,24 @@ def main(args):
     for fold in range(args.folds):
         print(f"Processing fold {fold}")
         set_seed(42) 
-        dataset_path = f"/home/dvegaa/DELFOS/CARDIUM/dataset/delfos_images_kfold/fold_{fold+1}" if not args.trimester else f"/home/dvegaa/DELFOS/CARDIUM/trimester_analisis/dataset_correct_trimesters/{args.trimester}_trimester/fold_{fold+1}"
-        json_root = "/home/dvegaa/DELFOS/CARDIUM/dataset/delfos_clinical_data_woe_wnm_standarized_f_normalized.json"
+        dataset_path = f"{args.image_folder_path}/fold_{fold+1}"
+        json_path = args.json_path
 
-        # Create data loaders for the current fold
-        _, test_loader = create_dataloaders(
+         # Create dataloaders
+        _, test_loader = create_multimodal_dataloaders(
             dataset_dir=dataset_path,
-            json_root=json_root,
-            dataset_class=DelfosDataset,
+            json_root=json_path,
+            dataset_class=CardiumDataset,
             transform_train=transform_train,
             transform_test=transform_test,
             batch_size=args.batch_size,
-            args=args,
-            multimodal=True
+            args=args
         )
 
         # Load image model
         img_model = ImageModel(args).build_model().to(device)
         if args.img_checkpoint:
-            img_checkpoint_path = os.path.join("/home/dvegaa/DELFOS/CARDIUM/img_script/image_checkpoints", args.img_checkpoint, f"fold{fold}_best_model.pth")
+            img_checkpoint_path = os.path.join(args.img_checkpoint, f"fold{fold}_best_model.pth")
             img_model = load_checkpoint(img_model, img_checkpoint_path, strict=False)
 
         if args.img_model == "medvit":
@@ -77,19 +75,20 @@ def main(args):
         # Load tabular model
         tab_model = TabularModel(args).build_model().to(device)
         if args.tab_checkpoint:
-            tab_checkpoint_path = os.path.join("/home/dvegaa/DELFOS/CARDIUM/tabular_script/tabular_checkpoints", args.tab_checkpoint, f"best_model_fold_{fold+1}.pth")
+            tab_checkpoint_path = os.path.join(args.tab_checkpoint, f"fold{fold}_best_model.pth")
             tab_model = load_checkpoint(tab_model, tab_checkpoint_path, strict=False)
         
         tab_model.mlp = torch.nn.Identity()
 
         # Load multimodal model
         multimodal_model = MultimodalModel(img_model=img_model, tab_model=tab_model, args=args).build_model().to(device)
-        multimodal_checkpoint_path = os.path.join("/home/dvegaa/DELFOS/CARDIUM/multimodal_script/multimodal_checkpoints", args.exp_name, f"fold{fold}_best_model.pth")
+        multimodal_checkpoint_path = os.path.join(args.multimodal_checkpoint, f"fold{fold}_best_model.pth")
         multimodal_model = load_checkpoint(multimodal_model, multimodal_checkpoint_path, strict=True)
 
         # Inference
         y_true, y_score = inference_multimodal(multimodal_model, test_loader, device)
-        f1, accuracy, precision, recall = compute_patient_metrics(y_score=y_score, y_true=y_true, mode="test", fold=fold)
+        f1, accuracy, precision, recall = compute_patient_metrics(y_score=y_score, y_true=y_true, 
+                                                                  mode="test", fold=fold, log_wandb=False)
 
         # Store metrics for this fold
         metrics_folds["precision"].append(precision)

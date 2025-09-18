@@ -11,7 +11,6 @@ from multimodal_script.multimodal_models.transformer_decoder import TransformerD
 from multimodal_script.multimodal_models.transformer_self_cross import TransformerSelfCross
 from multimodal_script.multimodal_models.transformer_cross_attention import TransformerCrossAttention
 from multimodal_script.multimodal_models.transformer_cross_attention_unimodal import TransformerCrossAttentionUnimodal
-from multimodal_script.multimodal_models.softmax import TransformerCrossAttentionSoftMax
 
 class MultimodalModel:
     """

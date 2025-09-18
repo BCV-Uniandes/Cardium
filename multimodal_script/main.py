@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch
 import torch.optim as optim
 import wandb
-from datetime import datetime
+import datetime
 import os
 import pathlib
 import sys
@@ -12,11 +12,13 @@ CARDIUM_path = pathlib.Path(__name__).resolve().parent.parent
 sys.path.append(str(CARDIUM_path))
 
 from multimodal_script.multimodal_models.get_multimodal_model import MultimodalModel
-from data.load_multimodal_data import create_dataloaders
-from train import train_one_epoch
-from evaluate import evaluate
+from data.load_multimodal_data import create_multimodal_dataloaders
 from utils import *
 from data.transformations import transform_train, transform_test
+from img_script.img_models.get_img_model import ImageModel
+from tabular_script.tab_models.get_tab_model import TabularModel
+from multimodal_script.run_multimodal import MultimodalTrainer
+from data.dataloader import CardiumDataset
 
 # Parse the arguments
 args = get_main_parser()
@@ -39,7 +41,6 @@ def main(args):
     wandb.log({"args": vars(args)})
 
     ######################### TRAIN MODEL ###########################################
-    device = "cuda" if torch.cuda.is_available() else "cpu"
     folds = args.folds
     test_metrics = {"F1 Score": [],
                     "Accuracy": [], 
@@ -54,23 +55,24 @@ def main(args):
         json_path = args.json_path
 
         # Set random seed for reproducibility
-        set_seed(args.seed)
+        set_seed(42)
 
         # Create dataloaders
-        train_loader, test_loader = create_dataloaders(
+        train_loader, test_loader = create_multimodal_dataloaders(
             dataset_dir=dataset_path,
             json_root=json_path,
-            dataset_class=DelfosDataset,
+            dataset_class=CardiumDataset,
             transform_train=transform_train,
             transform_test=transform_test,
             batch_size=args.batch_size,
-            fold=fold,
-            args=args,
-            multimodal=True
+            args=args
         )
+
+        print("Dataloaders have been successfully created")
 
         # --- Build models ---
         # Image model
+        device = "cuda" if torch.cuda.is_available() else "cpu"
         img_model = ImageModel(args).build_model().to(device)
         if args.img_checkpoint is not None:
             print("Loading image model pretrained weights...")
@@ -90,7 +92,7 @@ def main(args):
         tab_model = TabularModel(args).build_model().to(device)
         if args.tab_checkpoint is not None:
             print("Loading tabular model pretrained weights...")
-            tab_checkpoint = os.path.join(args.tab_checkpoint, f"best_model_fold_{fold+1}.pth")
+            tab_checkpoint = os.path.join(args.tab_checkpoint, f"fold{fold}_best_model.pth")
             checkpoint = torch.load(tab_checkpoint, map_location=device, weights_only=True)
             tab_model.load_state_dict(checkpoint, strict=False)
         tab_model.mlp = nn.Identity()
@@ -112,33 +114,32 @@ def main(args):
         # --- Optimizer ---
         optimizer = optim.AdamW(multimodal_model.parameters(), lr=args.lr, betas=(0.9, 0.999), weight_decay=args.weight_decay)
 
-        # --- Training Loop ---
-        best_f1 = 0.0
-        threshold = 0.5
-
         save_path = os.path.join("multimodal_checkpoints", exp_name, f"fold{fold}_best_model.pth")
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
+        trainer = MultimodalTrainer(multimodal_model, 
+                                    args, 
+                                    criterion, 
+                                    optimizer, 
+                                    device, 
+                                    train_loader, 
+                                    test_loader, 
+                                    fold, 
+                                    save_path)
+                
         for epoch in range(args.num_epochs):
             print(f"Epoch [{epoch+1}/{args.num_epochs}]")
 
-            # Train one epoch
-            train_one_epoch(multimodal_model, train_loader, criterion, optimizer, epoch, device, fold, exp_name, args)
+            # Training phase
+            trainer.train_one_epoch(epoch)
 
-            # Validates
-            best_f1, _, _, _, _ = evaluate(
-                multimodal_model, test_loader, criterion, device, fold,
-                mode="val", save_path=save_path, best_f1=best_f1, threshold=threshold
-            )
-
-            print(f"Best F1 so far: {best_f1}")
-
+            # Validation phase
+            trainer.validate_one_epoch()
 
         # --- Test phase ---
         print("Loading the best model for test evaluation...")
         multimodal_model.load_state_dict(torch.load(save_path))
-        _, f1_test, accuracy_test, precision_test, recall_test = evaluate(multimodal_model, test_loader, criterion, 
-                                                                       device, fold, args, mode="test", threshold=threshold)
+        f1_test, accuracy_test, precision_test, recall_test = trainer.test_one_epoch(multimodal_model)
 
         test_metrics["F1 Score"].append(f1_test)
         test_metrics["Accuracy"].append(accuracy_test)
@@ -153,7 +154,6 @@ def main(args):
         print(f"{metric}: Mean = {summary['mean']:.4f}, Std = {summary['std']:.4f}")
         wandb.log({f"Average {metric}": summary["mean"], f"Std {metric}": summary["std"]})
     wandb.finish()
-
 
 if __name__ == "__main__":
     main(args)

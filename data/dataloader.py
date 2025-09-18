@@ -51,17 +51,19 @@ class CardiumDataset(Dataset):
             embedding = []
 
             # Ensure features are extracted correctly (like in load_data())
-            embedding.extend(patient.get('a_patologicos_woe', []))
-            embedding.extend(patient.get('a_hereditaria_woe', []))
-            embedding.extend(patient.get('a_farmacologicos_woe', []))
+            embedding.extend(patient.get('pathological_history_woe', []))
+            embedding.extend(patient.get('hereditary_history_woe', []))
+            embedding.extend(patient.get('pharmacological_history_woe', []))
 
             for feature in [
-                'plaquetas', 'hemoglobina', 'hematocrito', 'leucocitos', 'neutrofilos',
-                'edad', 'semana_imagen', 'imc', 'semana_embarazo',
-                'anormalidad_cromosomica', 'tamizaje', 'riesgo_tromboembolico',  
-                'riesgo_psicosocial', 'tamizaje_depresion',
-                'tabaco', 'deficiencias_nutricionales', 'alcohol', 'ejercicio', 'gestaciones',
-                'partos', 'cesareas', 'abortos', 'ectopicos'
+                'platelets', 'hemoglobin', 'hematocrit', 'white_blood_cells', 'neutrophils',
+                'age', 'gestational_week_of_imaging', 'body_mass_index', 'gestational_age', 
+                'chromosomal_abnormality',
+                'screening_procedures', 'thromboembolic_risk',  
+                'psychosocial_risk', 'depression_screening',
+                'tobacco_use', 'nutritional_deficiencies', 'alcohol_use', 'physical_activity', 
+                'pregnancies',
+                'vaginal_births', 'cesarean_sections', 'miscarriages', 'ectopic_pregnancies'
             ]:
                 value = patient.get(feature, -1)  # Default to -1 if feature is missing
                 if isinstance(value, list):
@@ -79,12 +81,15 @@ class CardiumDataset(Dataset):
     def _load_data(self):
         for class_name in self.classes:
             class_folder = os.path.join(self.root, class_name)
-
+            images_dict = {}
             if not os.path.exists(class_folder):
                 print(f"Warning: Class folder not found: {class_folder}")
                 continue
-
-            for id_folder in os.listdir(class_folder):
+            
+            # Obtener y ordenar los directorios
+            folders = sorted(os.listdir(class_folder))
+            #folders = os.listdir(class_folder)
+            for id_folder in folders:
                 id_path = os.path.join(class_folder, id_folder)
                 if not os.path.isdir(id_path):
                     continue
@@ -96,7 +101,9 @@ class CardiumDataset(Dataset):
                         print(f"Warning: No patient info found for {id_folder}")
                         continue
 
-                for image in os.listdir(id_path):
+                images = sorted(os.listdir(id_path), key=lambda x: int(x.split('_')[0]))
+                #images_dict[id_folder] = images
+                for image in images:
                     image_path = os.path.join(id_path, image)
                     if image.lower().endswith((".png", ".jpg", ".jpeg")):
                         image_path = os.path.join(id_path, image)
@@ -105,8 +112,12 @@ class CardiumDataset(Dataset):
                         if self.multimodal:
                             self.data.append((image_path, patient_info, id_folder, label))
                         else:
-                            self.data.append((image_path, id_folder, label)) 
-                         
+                            self.data.append((image_path, id_folder, label))
+
+            #name = class_folder.split("/")
+            #with open(f"/home/dvegaa/Cardium/img_script/jsons_images_anon/{name[-3]}_{name[-2]}_{name[-1]}.json", "w") as f:
+            #    json.dump(images_dict, f, indent=4)
+
     def __len__(self):
         return len(self.data)
 
@@ -126,4 +137,4 @@ class CardiumDataset(Dataset):
         if self.multimodal:
             return (image, torch.tensor(patient_info, dtype=torch.float32), patient_id), label 
         else: 
-            return (image, patient_id), label 
+            return (image, patient_id), label

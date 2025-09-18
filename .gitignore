@@ -1,5 +1,7 @@
 __pycache__/
 img_script/wandb/
 tabular_script/wandb/
+multimodal_script/wandb/
 tabular_script/tabular_checkpoints/
 img_script/image_checkpoints/
+multimodal_script/multimodal_checkpoints/

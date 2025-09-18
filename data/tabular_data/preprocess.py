@@ -67,10 +67,11 @@ class Clinical_Record_Preprocessing:
 
         if self.complete_output_dir:
             os.makedirs(self.complete_output_dir, exist_ok=True)
-            output_file = os.path.join(self.complete_output_dir, "delfos_clinical_data_woe_wnm_standarized_f_normalized.json")
+            output_file = os.path.join(self.complete_output_dir, "delfos_clinical_data_woe_wnm_standarized_f_normalized_anon.json")
             with open(output_file, 'w') as file:
                 json.dump(standardized_data, file, indent=4)
 
+        breakpoint()
         file_names = ['fold_1', 'fold_2', 'fold_3']
         fold_1_train, fold_1_test, fold_2_train, fold_2_test, fold_3_train, fold_3_test = create_folds(
             standardized_data, self.image_folder_path, file_names

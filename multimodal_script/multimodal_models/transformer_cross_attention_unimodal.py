@@ -60,7 +60,7 @@ class TransformerCrossAttentionUnimodal(nn.Module):
         )
 
         # Transformer Decoder layer
-        decoder_layer = nn.TransformerDecoderLayer(
+        decoder_layer = CustomTransformerDecoderLayer(
             d_model=embed_dim,
             nhead=num_heads,
             dim_feedforward=embed_dim * 2,
@@ -136,40 +136,62 @@ class TransformerCrossAttentionUnimodal(nn.Module):
         return logits
 
 
+# Modified Decoder to store attention weigths 
 class CustomTransformerDecoderLayer(nn.TransformerDecoderLayer):
-    """
-    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.self_attn_weights = None   # to store self-attention weights
-        self.cross_attn_weights = None  # to store cross-attention weights
+        # Variables to store attention weights
+        self.self_attn_weights = None       
+        self.cross_attn_weights = None     
 
     def forward(self, tgt, memory, tgt_mask=None, memory_mask=None,
                 tgt_key_padding_mask=None, memory_key_padding_mask=None, 
                 tgt_is_causal=None, memory_is_causal=None):
         """
+        Modified forward pass that stores attention weights.
+        Parameters:
+        - tgt: query sequence from the same modality (e.g., image or tabular features)
+        - memory: key-value sequence from another modality
+        - tgt_mask: attention mask for the query sequence
+        - memory_mask: attention mask for memory (cross-attention)
+        - tgt_key_padding_mask: mask to ignore padding positions in tgt
+        - memory_key_padding_mask: mask to ignore padding positions in memory
+        - tgt_is_causal / memory_is_causal: for causal attention (optional)
         """
-        # --- Self-Attention: how target attends to itself ---
+
+        # ----------------------------
+        # SELF-ATTENTION
+        # ----------------------------
         tgt2, self_attn_weights = self.self_attn(
-            tgt, tgt, tgt,
-            attn_mask=tgt_mask,
-            key_padding_mask=tgt_key_padding_mask,
-            need_weights=True  # request attention weights
+            tgt, tgt, tgt,               # query, key, value = tgt
+            attn_mask=tgt_mask,          # optional mask
+            key_padding_mask=tgt_key_padding_mask,  # optional padding mask
+            need_weights=True            # return attention weights
         )
-        self.self_attn_weights = self_attn_weights  # cache for later visualization
+        # Store the self-attention weights
+        self.self_attn_weights = self_attn_weights
 
-        # --- Cross-Attention: how target attends to memory ---
+        # ----------------------------
+        # CROSS-ATTENTION
+        # ----------------------------
         tgt3, cross_attn_weights = self.multihead_attn(
-            tgt2, memory, memory,
-            attn_mask=memory_mask,
-            key_padding_mask=memory_key_padding_mask,
-            need_weights=True
+            tgt2, memory, memory,        # query=tgt2, key=memory, value=memory
+            attn_mask=memory_mask,       # optional mask
+            key_padding_mask=memory_key_padding_mask,  # optional padding mask
+            need_weights=True            # return attention weights
         )
-        self.cross_attn_weights = cross_attn_weights  # cache for later visualization
+        # Store the cross-attention weights
+        self.cross_attn_weights = cross_attn_weights
 
-        # Delegate to the base implementation (will re-run the official forward path)
+        # ----------------------------
+        # CALL THE ORIGINAL FORWARD
+        # ----------------------------
         return super().forward(
-            tgt, memory, tgt_mask=tgt_mask, memory_mask=memory_mask,
-            tgt_key_padding_mask=tgt_key_padding_mask, memory_key_padding_mask=memory_key_padding_mask,
-            tgt_is_causal=tgt_is_causal, memory_is_causal=memory_is_causal
+            tgt, memory,
+            tgt_mask=tgt_mask,
+            memory_mask=memory_mask,
+            tgt_key_padding_mask=tgt_key_padding_mask,
+            memory_key_padding_mask=memory_key_padding_mask,
+            tgt_is_causal=tgt_is_causal,
+            memory_is_causal=memory_is_causal
         )

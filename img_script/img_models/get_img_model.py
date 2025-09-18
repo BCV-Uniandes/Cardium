@@ -52,7 +52,7 @@ class ImageModel:
                 print("No medvit pretrained weights uploaded.")
                 self.model = model
         else:
-            raise ValueError(f"Unsupported model: {self.args.model}")
+            raise ValueError(f"Unsupported model")
 
         return self.model
 

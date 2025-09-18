@@ -12,7 +12,7 @@ torch.backends.cudnn.benchmark = False
 np.random.seed(seed)
 random.seed(seed)
 
-def create_dataloaders(dataset_dir, dataset_class, transform_train, transform_test, batch_size, args):
+def create_image_dataloaders(dataset_dir, dataset_class, transform_train, transform_test, batch_size, args):
     """
     Creates dataloaders for training and testing with weighted sampling for class imbalance.
 
@@ -28,13 +28,14 @@ def create_dataloaders(dataset_dir, dataset_class, transform_train, transform_te
     Returns:
         tuple: train_loader, test_loader
     """
-    # Training dataset
+    # Train and test directories
     train_dir = os.path.join(dataset_dir, "train")
     test_dir = os.path.join(dataset_dir, "test")
     
+    # Train dataset
     dataset_train = dataset_class(root=train_dir,  transform=transform_train)
         
-    # Calculate class weights for weighted sampling
+    # Calculate class weights for weighted sampling and define dataloader
     if args.sampling:
         print("Implementing sampling")
         num_negatives = sum(1 for _, label in dataset_train if label == 0) #2789 
@@ -58,7 +59,7 @@ def create_dataloaders(dataset_dir, dataset_class, transform_train, transform_te
         num_positives = np.sum(np.array(dataset_train.labels) == 1)
         sample_weights = None
 
-    # Test dataset and DataLoader
+    # Test dataset and dataLoader
     dataset_test = dataset_class(root=test_dir, transform=transform_test)    
     test_loader = DataLoader(dataset_test, batch_size=batch_size, shuffle=False, num_workers=8, pin_memory=True)
 

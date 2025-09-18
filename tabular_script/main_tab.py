@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 from data.tabular_data.preprocess import Clinical_Record_Preprocessing
 from data.tabular_data.load_tabular_data import TabularDataLoaders
-from tabular_script.train_tab import TabularTrainer
+from tabular_script.run_tab import TabularTrainer
 from tabular_script.tab_models.get_tab_model import TabularModel
 from utils import *
 

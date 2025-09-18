@@ -11,14 +11,11 @@ import sys
 delfos_path = pathlib.Path(__name__).resolve().parent.parent
 sys.path.append(str(delfos_path))
 from data.transformations import transform_train, transform_test
-from data.load_img_data import create_dataloaders
-from img_script.train_img import train_one_epoch
-from img_script.evaluate_img import evaluate
+from data.load_img_data import create_image_dataloaders
 from img_script.img_models.get_img_model import ImageModel
-from data.img_dataloader import DelfosDataset
 from data.dataloader import CardiumDataset
 from utils import *
-from img_script.run import ImageTrainer
+from img_script.run_img import ImageTrainer
 
 # Parse the arguments
 args = get_main_parser()
@@ -39,13 +36,15 @@ def main(args):
                     "Recall": []}
     
     for fold in range(folds):
+        print(f"\n=== Fold {fold + 1}/{folds} ===\n")
+
         # Set the random seed for reproducibility
         set_seed(42)
         
         # Create Dataloaders for the current fold
         dataset_path = f"{args.image_folder_path}/fold_{fold+1}" # Without trimester separation
 
-        train_loader, test_loader = create_dataloaders(
+        train_loader, test_loader = create_image_dataloaders(
             dataset_dir = dataset_path,
             dataset_class=CardiumDataset, 
             transform_train=transform_train, 
@@ -53,6 +52,7 @@ def main(args):
             batch_size=args.batch_size,
             args=args 
         )
+ 
         print("Dataloaders have been successfully created")
 
         # Create the imag only model
