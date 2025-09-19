@@ -41,9 +41,10 @@ def get_main_parser():
     parser.add_argument("--class_dropout", type=float, default=0.4, help="Path dropout to be used in multimodal models")
     parser.add_argument("--sampling", type=str2bool, default=True, help="Whether to use weighted random sampling in dataloader or not")
     parser.add_argument("--unimodal", type=str, default="img", help="Whether to use image modality (img) or tabular modality (tab)")
-    parser.add_argument("--image_folder_path", type=str, default=str("/home/dvegaa/DELFOS/CARDIUM/dataset/cardium_images_anon"), help="Image data path for training and evaluation")
+    parser.add_argument("--image_folder_path", type=str, default=str(BASE_DIR/"dataset/cardium_images"), help="Image data path for training and evaluation")
     parser.add_argument("--json_path", type=str, default=str(BASE_DIR/"data/tabular_data/delfos_clinical_data_woe_wnm_standarized_f_normalized.json"), help="Path to json file containing tabular data for training and evaluation")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
+    parser.add_argument("--trimester", type=str, default=None, help="Which trimester to evaluate")
     ########################################## IMAGE MODEL ###############################################################################
     parser.add_argument("--img_pretrain", type=str2bool, default=True, help="True for pretrained image model")
     parser.add_argument("--img_model", type=str, default="vit_small", help="whether to use medvit, vit_tiny, vity_small, resnet18, resnet50")

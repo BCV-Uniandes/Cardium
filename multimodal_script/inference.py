@@ -45,7 +45,11 @@ def main(args):
     for fold in range(args.folds):
         print(f"Processing fold {fold}")
         set_seed(42) 
-        dataset_path = f"{args.image_folder_path}/fold_{fold+1}"
+        if args.trimester == None:
+            dataset_path = f"{args.image_folder_path}/fold_{fold+1}"
+        else:
+            dataset_path = f"{args.image_folder_path}/{args.trimester}_trimester/fold_{fold+1}"
+        
         json_path = args.json_path
 
          # Create dataloaders
