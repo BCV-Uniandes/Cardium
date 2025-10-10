@@ -25,7 +25,7 @@ class CardiumDataset(Dataset):
         self.json_root = json_root
         self.transform = transform
         self.multimodal = multimodal
-
+        
         self.patient_info = {}
         self.data = []
         self.views = []
@@ -133,7 +133,7 @@ class CardiumDataset(Dataset):
             image = Image.open(image_path).convert("RGB")
             image = self.transform(np.array(image))
             self.cache[image_path] = image
-        
+
         if self.multimodal:
             return (image, torch.tensor(patient_info, dtype=torch.float32), patient_id), label 
         else: 

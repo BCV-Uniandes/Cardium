@@ -5,8 +5,8 @@ import pathlib
 import sys
 from torchvision.models import resnet50, resnet18
 
-delfos_path = pathlib.Path(__name__).resolve().parent.parent
-sys.path.append(str(delfos_path))
+CARDIUM_path = pathlib.Path(__file__).resolve().parent.parent
+sys.path.append(str(CARDIUM_path))
 from img_script.img_models.MedViT import MedViT_small
 from utils import *
 set_seed(42)

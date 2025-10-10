@@ -6,8 +6,8 @@ import pathlib
 import sys
 import numpy as np
 
-delfos_path = pathlib.Path(__name__).resolve().parent.parent
-sys.path.append(str(delfos_path))
+CARDIUM_path = pathlib.Path(__file__).resolve().parent.parent
+sys.path.append(str(CARDIUM_path))
 from utils import *
 
 
@@ -60,7 +60,7 @@ class MultimodalTrainer:
             # Move inputs and targets to the appropriate device
             img_data, tab_data = inputs[0].to(self.device), inputs[1].to(self.device)
             targets = targets.to(self.device).float()  # Ensure float for BCE/ regression
-
+            
             # Forward pass
             self.optimizer.zero_grad()
             outputs = self.model(img_data, tab_data)

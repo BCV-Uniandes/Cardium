@@ -18,7 +18,7 @@ str2bool = lambda x: (str(x).lower() == 'true')
 
 def get_main_parser():
     parser = argparse.ArgumentParser(description="Training configuration for Vision Transformer")
-    BASE_DIR = pathlib.Path(__name__).resolve().parent.parent
+    BASE_DIR = pathlib.Path(__file__).resolve().parent
 
     # Add arguments
     ######################################## MULTIMODAL MODEL #############################################################################

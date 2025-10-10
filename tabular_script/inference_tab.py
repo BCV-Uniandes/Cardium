@@ -2,8 +2,8 @@ import torch
 import os
 from pathlib import Path
 import sys
-sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+sys.path.append(str(Path(__file__).resolve().parent.parent))
 from data.tabular_data.load_tabular_data import TabularDataLoaders
 from tabular_script.tab_models.get_tab_model import TabularModel
 from utils import *

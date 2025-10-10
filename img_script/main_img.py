@@ -8,8 +8,8 @@ import os
 import pathlib
 import sys
 
-delfos_path = pathlib.Path(__name__).resolve().parent.parent
-sys.path.append(str(delfos_path))
+CARDIUM_path = pathlib.Path(__file__).resolve().parent.parent
+sys.path.append(str(CARDIUM_path))
 from data.transformations import transform_train, transform_test
 from data.load_img_data import create_image_dataloaders
 from img_script.img_models.get_img_model import ImageModel

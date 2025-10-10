@@ -8,7 +8,7 @@ import pathlib
 import sys
 import numpy as np
 
-CARDIUM_path = pathlib.Path(__name__).resolve().parent.parent
+CARDIUM_path = pathlib.Path(__file__).resolve().parent.parent
 sys.path.append(str(CARDIUM_path))
 
 from multimodal_script.multimodal_models.get_multimodal_model import MultimodalModel

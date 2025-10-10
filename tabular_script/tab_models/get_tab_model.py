@@ -3,8 +3,8 @@ from torch import nn
 import sys
 import pathlib 
 
-delfos_path = pathlib.Path(__name__).resolve().parent.parent
-sys.path.append(str(delfos_path))
+CARDIUM_path = pathlib.Path(__file__).resolve().parent.parent
+sys.path.append(str(CARDIUM_path))
 from tabular_script.tab_models.TabularTransformer import TabEncoder
 
 class TabularModel:
