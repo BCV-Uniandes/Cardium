@@ -6,4 +6,4 @@ tabular_script/tabular_checkpoints/
 img_script/image_checkpoints/
 multimodal_script/multimodal_checkpoints/
 dataset/
-create_dirs.py
+wandb/

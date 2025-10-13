@@ -79,7 +79,8 @@ def main(args):
         loss_weights = torch.tensor([negatives / positives], dtype=torch.float32).to(device) * args.loss_factor
         criterion = nn.BCEWithLogitsLoss(pos_weight=loss_weights)
 
-        save_path = os.path.join("tabular_checkpoints", exp_name, f"fold{fold_idx}_best_model.pth")
+        BASE_DIR = pathlib.Path(__file__).resolve().parent
+        save_path = os.path.join(BASE_DIR, "tabular_checkpoints", exp_name, f"fold{fold_idx}_best_model.pth")
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
         
         # --- Initialize Trainer ---

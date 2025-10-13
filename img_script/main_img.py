@@ -74,7 +74,8 @@ def main(args):
 
         # --- Training Loop ---
         # Save best model
-        save_path = os.path.join("image_checkpoints", exp_name, f"fold{fold}_best_model.pth")
+        BASE_DIR = pathlib.Path(__file__).resolve().parent
+        save_path = os.path.join(BASE_DIR, "image_checkpoints", exp_name, f"fold{fold}_best_model.pth")
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
         trainer = ImageTrainer(model, 
