@@ -2,7 +2,7 @@
 
 [![Paper](https://img.shields.io/badge/ICCV-2025-blue)](https://openreview.net/forum?id=MDHl5LCcka)
 [![License: Apache](https://img.shields.io/badge/License-Apache-green.svg)](./LICENSE)
-[![License: CC BY NC](https://img.shields.io/badge/License-CC_BY_NC-red.svg)](./LICENSE)
+[![License: CC BY NC](https://img.shields.io/badge/License-CC_BY_NC-red.svg)](./DATDATASET_LICENSE)
 [![Web Page](https://img.shields.io/badge/Web_Page-CARDIUM-orange)]()
 
 This repository contains the code implementation of **CARDIUM: Congenital Anomaly Recognition with Diagnostic Images and Unified Medical Records**, which was presented at the *Third Workshop on Computer Vision for Automated Medical Diagnosis* at ICCV 2025.
