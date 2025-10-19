@@ -8,7 +8,7 @@
 ---
 
 ## 📰 News
-- **[October 2025]** 🚀 *Coming soon!* We will be releasing the **tabular data**, **imaging data**, associated with the CARDIUM project. Stay tuned to this repository or check our [project website](https://bcv-uniandes.github.io/CardiumPage/) for updates.
+- **[October 2025]** 🚀 Coming soon! We will be releasing the tabular data, imaging data, and pretrained models associated with the CARDIUM project. Stay tuned to this repository or check our [project website](https://bcv-uniandes.github.io/CardiumPage/) for updates.
 ---
 
 
