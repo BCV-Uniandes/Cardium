@@ -3,7 +3,14 @@
 [![Paper](https://img.shields.io/badge/ICCV-2025-blue)](https://openreview.net/forum?id=MDHl5LCcka)
 [![License: Apache](https://img.shields.io/badge/License-Apache-green.svg)](./LICENSE)
 [![License: CC BY NC](https://img.shields.io/badge/License-CC_BY_NC-red.svg)](./DATDATASET_LICENSE)
-[![Web Page](https://img.shields.io/badge/Web_Page-CARDIUM-orange)]()
+[![Project Website](https://img.shields.io/badge/Project_Website-CARDIUM-orange)](https://bcv-uniandes.github.io/CardiumPage/)
+
+---
+
+## 📰 News
+- **[October 2025]** 🚀 *Coming soon!* We will be releasing the **tabular data**, **imaging data**, associated with the CARDIUM project. Stay tuned to this repository or check our [project website](https://bcv-uniandes.github.io/CardiumPage/) for updates.
+---
+
 
 This repository contains the code implementation of **CARDIUM: Congenital Anomaly Recognition with Diagnostic Images and Unified Medical Records**, which was presented at the *Third Workshop on Computer Vision for Automated Medical Diagnosis* at ICCV 2025.
 
