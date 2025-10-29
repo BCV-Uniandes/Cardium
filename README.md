@@ -1,6 +1,6 @@
 #  CARDIUM: Congenital Anomaly Recognition with Diagnostic Images and Unified Medical Records
 
-[![Paper](https://img.shields.io/badge/ICCV-2025-blue)](https://openreview.net/forum?id=MDHl5LCcka)
+[![Paper](https://img.shields.io/badge/ICCV-2025-blue)](https://arxiv.org/abs/2510.15208)
 [![License: Apache](https://img.shields.io/badge/License-Apache-green.svg)](./LICENSE)
 [![License: CC BY NC](https://img.shields.io/badge/License-CC_BY_NC-red.svg)](./DATDATASET_LICENSE)
 [![Project Website](https://img.shields.io/badge/Project_Website-CARDIUM-orange)](https://bcv-uniandes.github.io/CardiumPage/)
