@@ -49,19 +49,18 @@ The CARDIUM dataset includes:
 
 All image and tabular data files can be accessed through the following [download link](#), **exclusively for academic and research purposes**. Access is subject to verification.
 
-> **Note:** After downloading, the image data will be provided as a `.tar` file. Please extract it inside the `data/` directory, maintaining the folder structure shown below. Ensure tabular data JSONs are also downloaded inside this directory.
+> **Note:** After downloading, the image data will be provided as a `.tar.gz` file. Please extract it inside the `data/` directory, maintaining the folder structure shown below. Ensure tabular data JSONs are also downloaded inside this directory.
 >  
 > Example (Linux/macOS):  
 > ```bash
-> tar -xvf cardium_images_anon.tar -C data/
+> tar -xvzf cardium_images.tar.gz -C data/
 > ```
-
 
 Upon download, the dataset will follow this structure:
 
 ```text
 data/
-├── cardium_images_anon/
+├── cardium_images/
 │   ├── fold_1/
 │   │   ├── train/
 │   │   │   ├── CHD/
@@ -90,6 +89,17 @@ Pretrained models are available for:
 
 These models can be downloaded from the same [link](#) as the dataset. Access is granted **only to individuals or institutions with academic or research purposes**, and requests are subject to verification.
 
+After downloading, the image, tabular and multimodal weights will be provided as `.tar.gz` files. Please extract the weights following these commands:
+
+```bash 
+tar -xvzf tabular_encoder.tar.gz -C tabular_script/tabular_checkpoints/
+```
+```bash 
+tar -xvzf image_encoder.tar.gz -C img_script/image_checkpoints/
+```
+```bash 
+tar -xvzf cardium_model_weights.tar.gz -C multimodal_script/multimodal_checkpoints/
+```
 
 
 ## Setup
@@ -179,7 +189,6 @@ python img_script/inference_img.py --lr 1e-6 --batch_size 8 --loss_factor 2 --im
 ```bash 
 python multimodal_script/inference_multimodal.py --multimodal_checkpoint {multimodal_checkpoint_route}  
 ```
-
 
 ### Trimester Performance
 For trimestral CHD detection results (Section 5.2):

@@ -8,7 +8,7 @@ import pathlib
 import sys
 import numpy as np
 
-CARDIUM_path = pathlib.Path(__name__).resolve().parent.parent
+CARDIUM_path = pathlib.Path(__file__).resolve().parent.parent
 sys.path.append(str(CARDIUM_path))
 
 from multimodal_script.multimodal_models.get_multimodal_model import MultimodalModel
@@ -34,7 +34,7 @@ def main(args):
     
     # Initialize experiment in Weights & Biases
     exp_name = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-    wandb.init(project="MultiModal", 
+    wandb.init(project="CARDIUM", 
             entity="spared_v2", 
             name=exp_name)
 
@@ -114,7 +114,8 @@ def main(args):
         # --- Optimizer ---
         optimizer = optim.AdamW(multimodal_model.parameters(), lr=args.lr, betas=(0.9, 0.999), weight_decay=args.weight_decay)
 
-        save_path = os.path.join("multimodal_checkpoints", exp_name, f"fold{fold}_best_model.pth")
+        BASE_DIR = pathlib.Path(__file__).resolve().parent
+        save_path = os.path.join(BASE_DIR, "multimodal_checkpoints", exp_name, f"fold{fold}_best_model.pth")
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
         trainer = MultimodalTrainer(multimodal_model, 

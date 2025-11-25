@@ -3,8 +3,8 @@ from torch import nn
 import pathlib 
 import sys 
 
-delfos_path = pathlib.Path(__name__).resolve().parent.parent
-sys.path.append(str(delfos_path))
+CARDIUM_path = pathlib.Path(__file__).resolve().parent.parent
+sys.path.append(str(CARDIUM_path))
 from multimodal_script.multimodal_models.mlp import MLP
 from multimodal_script.multimodal_models.transformer_encoder import TransformerPatientPerEncoder
 from multimodal_script.multimodal_models.transformer_decoder import TransformerDecoder

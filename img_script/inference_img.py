@@ -10,11 +10,10 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-delfos_path = pathlib.Path(__name__).resolve().parent.parent
-sys.path.append(str(delfos_path))
+CARDIUM_path = pathlib.Path(__file__).resolve().parent.parent
+sys.path.append(str(CARDIUM_path))
 from data.transformations import transform_train, transform_test
 from data.load_img_data import create_dataloaders
-from data.img_dataloader import DelfosDataset
 from data.dataloader import CardiumDataset
 from img_script.img_models.get_img_model import ImageModel
 from utils import *

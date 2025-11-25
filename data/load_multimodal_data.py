@@ -6,8 +6,8 @@ import random
 import pathlib
 import sys
 
-delfos_path = pathlib.Path(__name__).resolve().parent.parent
-sys.path.append(str(delfos_path))
+CARDIUM_path = pathlib.Path(__file__).resolve().parent.parent
+sys.path.append(str(CARDIUM_path))
 from utils import *
 
 #set_seed(42)

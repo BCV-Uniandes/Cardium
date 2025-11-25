@@ -8,8 +8,8 @@ import os
 import pathlib
 import sys
 
-delfos_path = pathlib.Path(__name__).resolve().parent.parent
-sys.path.append(str(delfos_path))
+CARDIUM_path = pathlib.Path(__file__).resolve().parent.parent
+sys.path.append(str(CARDIUM_path))
 from data.transformations import transform_train, transform_test
 from data.load_img_data import create_image_dataloaders
 from img_script.img_models.get_img_model import ImageModel
@@ -23,7 +23,7 @@ args = get_main_parser()
 def main(args): 
     # Initialize experiment in Weights & Biases
     exp_name = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-    wandb.init(project="MedVit", 
+    wandb.init(project="CARDIUM", 
             entity="spared_v2", 
             name=exp_name)
 
@@ -74,7 +74,8 @@ def main(args):
 
         # --- Training Loop ---
         # Save best model
-        save_path = os.path.join("image_checkpoints", exp_name, f"fold{fold}_best_model.pth")
+        BASE_DIR = pathlib.Path(__file__).resolve().parent
+        save_path = os.path.join(BASE_DIR, "image_checkpoints", exp_name, f"fold{fold}_best_model.pth")
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
         trainer = ImageTrainer(model, 
