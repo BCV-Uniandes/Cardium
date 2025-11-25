@@ -5,7 +5,7 @@ import torchvision.transforms as transforms
 
 # Define data transformation
 transform_train = transforms.Compose([
-    transforms.Lambda(lambda x: x[:, 65:, :]), 
+    #transforms.Lambda(lambda x: x[:, 65:, :]), 
     transforms.ToPILImage(), 
     transforms.Resize((224, 224), antialias=True), 
     torchvision.transforms.AugMix(),
@@ -14,7 +14,7 @@ transform_train = transforms.Compose([
 ])
 
 transform_test = transforms.Compose([
-    transforms.Lambda(lambda x: x[:, 65:, :]),
+    #transforms.Lambda(lambda x: x[:, 65:, :]),
     transforms.ToPILImage(),
     transforms.Resize((224, 224), antialias=True), 
     transforms.ToTensor(),

@@ -27,7 +27,7 @@ def main(args):
     # Initialize experiment in Weights & Biases
     exp_name = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     wandb.init(
-        project="Final_Encoder_Reproducibility",
+        project="CARDIUM",
         entity="spared_v2", 
         name=exp_name
     )

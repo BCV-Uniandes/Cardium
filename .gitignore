@@ -7,3 +7,5 @@ img_script/image_checkpoints/
 multimodal_script/multimodal_checkpoints/
 dataset/
 wandb/
+image_anonimization/
+cardium_data_tar_files/

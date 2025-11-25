@@ -48,14 +48,14 @@ def get_main_parser():
     ########################################## IMAGE MODEL ###############################################################################
     parser.add_argument("--img_pretrain", type=str2bool, default=True, help="True for pretrained image model")
     parser.add_argument("--img_model", type=str, default="vit_small", help="whether to use medvit, vit_tiny, vity_small, resnet18, resnet50")
-    parser.add_argument("--img_checkpoint", type=str, default=str(BASE_DIR/"img_script/image_checkpoints/vit_small"), help="Path to image model checkpoint")
+    parser.add_argument("--img_checkpoint", type=str, default=str(BASE_DIR/"img_script/image_checkpoints/image_encoder"), help="Path to image model checkpoint")
     parser.add_argument("--img_path_dropout", type=float, default=0.3, help="Path dropout to be used in multimodal models")
     parser.add_argument("--img_class_dropout", type=float, default=0.2, help="Path dropout to be used in multimodal models")
     ######################################### TABULAR MODEL ##############################################################################
     parser.add_argument("--tab_pretrain", type=str2bool, default=False, help="True for pretrained tabular model")
     parser.add_argument("--tab_model", type=str, default="TabTransformer", help="whether to use TabTransformer")
     parser.add_argument("--tab_feature_dim", type=int, default=128, help="Dimension of tabular features to be used in multimodal model")
-    parser.add_argument("--tab_checkpoint", type=str, default=str(BASE_DIR/"tabular_script/tabular_checkpoints/best_tab"), help="Path to tabular model checkpoint")
+    parser.add_argument("--tab_checkpoint", type=str, default=str(BASE_DIR/"tabular_script/tabular_checkpoints/tabular_encoder"), help="Path to tabular model checkpoint")
     parser.add_argument("--tab_num_heads", type=int, default=8, help="Number of heads of the TransformerEncoder model")
     parser.add_argument("--tab_num_layers", type=int, default=2, help="Number of layers of the TransformerEncoder model")
     parser.add_argument("--tab_num_features", type=int, default=97, help="The dimension of the input vector")

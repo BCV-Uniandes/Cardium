@@ -23,7 +23,7 @@ args = get_main_parser()
 def main(args): 
     # Initialize experiment in Weights & Biases
     exp_name = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-    wandb.init(project="MedVit", 
+    wandb.init(project="CARDIUM", 
             entity="spared_v2", 
             name=exp_name)
 
