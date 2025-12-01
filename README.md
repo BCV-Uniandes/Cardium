@@ -5,12 +5,6 @@
 [![License: CC BY NC](https://img.shields.io/badge/License-CC_BY_NC-red.svg)](./DATDATASET_LICENSE)
 [![Project Website](https://img.shields.io/badge/Project_Website-CARDIUM-orange)](https://bcv-uniandes.github.io/CardiumPage/)
 
----
-
-## 📰 News
-- **[October 2025]** 🚀 Coming soon! We will be releasing the tabular data, imaging data, and pretrained models associated with the CARDIUM project. Stay tuned to this repository or check our [project website](https://bcv-uniandes.github.io/CardiumPage/) for updates.
----
-
 
 This repository contains the code implementation of **CARDIUM: Congenital Anomaly Recognition with Diagnostic Images and Unified Medical Records**, which was presented at the *Third Workshop on Computer Vision for Automated Medical Diagnosis* at ICCV 2025.
 
@@ -47,13 +41,13 @@ The CARDIUM dataset includes:
   - `delfos_clinical_data_wnm_translated_final_cleaned.json` – raw data for tabular encoder training.
   - `delfos_clinical_data_woe_wnm_standarized_f_normalized.json` – preprocessed data used for the multimodal model.
 
-All image and tabular data files can be accessed through the following [download link](#), **exclusively for academic and research purposes**. Access is subject to verification.
+All image and tabular data files are available through the following [**access request form**](https://docs.google.com/forms/d/e/1FAIpQLSeW3EKB54HnfSVmyOf8yD9swB7DUiaEr0_pSMl6z_zTwdJR-Q/viewform?usp=header), which is used to **verify institutional or educational affiliation** prior to granting download permissions. Once the request is approved, you will receive the download link to the dataset. The dataset is distributed **exclusively for academic and research purposes**.
 
 > **Note:** After downloading, the image data will be provided as a `.tar.gz` file. Please extract it inside the `data/` directory, maintaining the folder structure shown below. Ensure tabular data JSONs are also downloaded inside this directory.
 >  
 > Example (Linux/macOS):  
 > ```bash
-> tar -xvzf cardium_images.tar.gz -C data/
+>   tar -xvzf cardium_images.tar.gz -C data/
 > ```
 
 Upon download, the dataset will follow this structure:
@@ -87,7 +81,7 @@ Pretrained models are available for:
 - The **tabular-based classifier** (trained on the CARDIUM tabular dataset).
 - The **multimodal model** combining tabular and image features.
 
-These models can be downloaded from the same [link](#) as the dataset. Access is granted **only to individuals or institutions with academic or research purposes**, and requests are subject to verification.
+These models can be downloaded from the same [link](https://docs.google.com/forms/d/e/1FAIpQLSeW3EKB54HnfSVmyOf8yD9swB7DUiaEr0_pSMl6z_zTwdJR-Q/viewform?usp=header) as the dataset. Access is granted **only to individuals or institutions with academic or research purposes**, and requests are subject to verification.
 
 After downloading, the image, tabular and multimodal weights will be provided as `.tar.gz` files. Please extract the weights following these commands:
 
