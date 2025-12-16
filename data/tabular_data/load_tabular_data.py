@@ -148,7 +148,7 @@ class TabularDataLoaders:
         return np.array(X, dtype=np.float32), np.array(y, dtype=np.float32)
 
     def load_fold(self, fold_number, output_dir):
-        X_train, y_train = self.load_data(f'{output_dir}/delfos_processed_dataset_fold_{fold_number + 1}_trainf.json')
-        X_val, y_val = self.load_data(f'/{output_dir}/delfos_processed_dataset_fold_{fold_number + 1}_testf.json')
+        X_train, y_train = self.load_data(f'{output_dir}/cardium_processed_dataset_fold_{fold_number + 1}_trainf.json')
+        X_val, y_val = self.load_data(f'/{output_dir}/cardium_processed_dataset_fold_{fold_number + 1}_testf.json')
         
         return X_train, y_train, X_val, y_val

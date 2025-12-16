@@ -67,7 +67,7 @@ class Clinical_Record_Preprocessing:
 
         if self.complete_output_dir:
             os.makedirs(self.complete_output_dir, exist_ok=True)
-            output_file = os.path.join(self.complete_output_dir, "delfos_clinical_data_woe_wnm_standarized_f_normalized_anon.json")
+            output_file = os.path.join(self.complete_output_dir, "cardium_clinical_data_woe_wnm_standarized_f_normalized_anon.json")
             with open(output_file, 'w') as file:
                 json.dump(standardized_data, file, indent=4)
 
@@ -89,6 +89,6 @@ class Clinical_Record_Preprocessing:
             }
 
             for fold_name, fold_data in fold_files.items():
-                output_file = os.path.join(self.output_dir, f"delfos_processed_dataset_{fold_name}f.json")
+                output_file = os.path.join(self.output_dir, f"cardium_processed_dataset_{fold_name}f.json")
                 with open(output_file, 'w') as file:
                     json.dump(fold_data, file, indent=4)
