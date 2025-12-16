@@ -38,8 +38,8 @@ The CARDIUM dataset includes:
 
 - **6558 anonymized images**, with 16.3% corresponding to positive CHD patients and 83.7% to negative patients, structured across 3 folds for training and testing.
 - **Clinical tabular data** in both raw and preprocessed formats:
-  - `delfos_clinical_data_wnm_translated_final_cleaned.json` – raw data for tabular encoder training.
-  - `delfos_clinical_data_woe_wnm_standarized_f_normalized.json` – preprocessed data used for the multimodal model.
+  - `cardium_clinical_data_wnm_translated_final_cleaned.json` – raw data for tabular encoder training.
+  - `cardium_clinical_data_woe_wnm_standarized_f_normalized.json` – preprocessed data used for the multimodal model.
 
 All image and tabular data files are available through the following [**access request form**](https://docs.google.com/forms/d/e/1FAIpQLSeW3EKB54HnfSVmyOf8yD9swB7DUiaEr0_pSMl6z_zTwdJR-Q/viewform?usp=header), which is used to **verify institutional or educational affiliation** prior to granting download permissions. Once the request is approved, you will receive the download link to the dataset. The dataset is distributed **exclusively for academic and research purposes**.
 
@@ -69,8 +69,8 @@ data/
 │       ├── train/
 │       └── test/
 └── tabular_data/
-    ├── delfos_clinical_data_wnm_translated_final_cleaned.json
-    └── delfos_clinical_data_woe_wnm_standarized_f_normalized.json
+    ├── cardium_clinical_data_wnm_translated_final_cleaned.json
+    └── cardium_clinical_data_woe_wnm_standarized_f_normalized.json
 ```
 
 ### Pretrained Models
