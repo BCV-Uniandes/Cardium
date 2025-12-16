@@ -118,9 +118,9 @@ After training the tabular encoder, the repository structure will include the fo
 .
 ├── data/
 │   └── tabular_data/
-│       ├── delfos_clinical_data_wnm_translated_final_cleaned.json
+│       ├── cardium_clinical_data_wnm_translated_final_cleaned.json
 │       │   (raw file for tabular encoder training)
-│       ├── delfos_clinical_data_woe_wnm_standarized_f_normalized.json
+│       ├── cardium_clinical_data_woe_wnm_standarized_f_normalized.json
 │       │   (preprocessed file for multimodal model)
 │       └── output_folds_final/
 │           (contains 6 JSONs for training and testing across three folds)
