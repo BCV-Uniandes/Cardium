@@ -9,3 +9,6 @@ dataset/
 wandb/
 image_anonimization/
 cardium_data_tar_files/
+README_CARDIUM.me
+cardium_images.tar.gz
+data/cardium_images.tar.gz

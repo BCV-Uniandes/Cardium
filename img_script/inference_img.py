@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 CARDIUM_path = pathlib.Path(__file__).resolve().parent.parent
 sys.path.append(str(CARDIUM_path))
 from data.transformations import transform_train, transform_test
-from data.load_img_data import create_dataloaders
+from data.load_img_data import create_image_dataloaders
 from data.dataloader import CardiumDataset
 from img_script.img_models.get_img_model import ImageModel
 from utils import *
@@ -45,7 +45,7 @@ def main(args):
         dataset_path = f"{args.image_folder_path}/fold_{fold+1}" # Without trimester separation
 
         # Create data loaders for the current fold
-        _, test_loader = create_dataloaders(
+        _, test_loader = create_image_dataloaders(
             dataset_dir = dataset_path,
             dataset_class=CardiumDataset,
             transform_train=transform_train,
