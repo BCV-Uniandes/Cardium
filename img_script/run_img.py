@@ -142,7 +142,8 @@ class ImageTrainer:
         y_score = np.array(list(y_score_patient_avg.values()))
 
         # --- 5. Compute patient-level metrics ---
-        f1, accuracy, precision, recall = compute_patient_metrics(
+        #f1, accuracy, precision, recall = compute_patient_metrics(
+        f1, accuracy, precision, recall = compute_patient_metrics_best_threshold(
             y_score=y_score, 
             y_true=y_true,
             mode="val",
@@ -201,7 +202,8 @@ class ImageTrainer:
         y_score = np.array(list(y_score_patient_avg.values()))
 
         # --- 4. Compute patient-level metrics ---
-        f1, accuracy, precision, recall = compute_patient_metrics(
+        #f1, accuracy, precision, recall = compute_patient_metrics(
+        f1, accuracy, precision, recall = compute_patient_metrics_best_threshold(
             y_score=y_score, 
             y_true=y_true,
             mode="test",

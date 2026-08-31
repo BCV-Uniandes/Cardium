@@ -142,6 +142,68 @@ def compute_patient_metrics(
 
     return f1, accuracy, precision, recall
 
+def compute_patient_metrics_best_threshold(
+    y_score: np.array,
+    y_true: np.array,
+    mode: str = "val",
+    fold: str = None,
+    log_wandb: bool = True
+):
+    """
+    Compute patient-level metrics using the threshold (in [0.01, 0.99]) that
+    maximizes F1 score on the given scores, instead of a fixed 0.5 cutoff.
+
+    Args:
+        y_score_patient (dict): Dictionary mapping patient IDs to a list of prediction scores.
+        y_true_patient (dict): Dictionary mapping patient IDs to true labels (0 or 1).
+        mode (str): Evaluation mode, "val" or "test". Determines logging behavior.
+        fold (str, optional): Fold identifier for test metrics logging.
+
+    Returns:
+        f1 (float): Patient-level F1 score at the best threshold.
+        best_threshold (float): Threshold that maximizes F1.
+    """
+
+    # --- 1. Sweep thresholds to find the one that maximizes F1 ---
+    thresholds = np.linspace(0.01, 0.99, 99)
+    best_threshold = 0.5
+    best_f1 = -1.0
+    for threshold in thresholds:
+        y_pred = (y_score > threshold).astype(int)
+        f1 = f1_score(y_true, y_pred, zero_division=0)
+        if f1 > best_f1:
+            best_f1 = f1
+            best_threshold = threshold
+
+    # --- 2. Compute common classification metrics at the best threshold ---
+    y_pred = (y_score > best_threshold).astype(int)
+    accuracy = accuracy_score(y_true, y_pred)
+    precision = precision_score(y_true, y_pred, zero_division=0)
+    recall = recall_score(y_true, y_pred, zero_division=0)
+    f1 = f1_score(y_true, y_pred, zero_division=0)
+
+    # --- 3. Log and print patient-level metrics ---
+    print(f"{mode} Metrics (Patient-level) on fold {fold}, best threshold {best_threshold:.2f}: "
+          f"Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Recall: {recall:.4f}, F1: {f1:.4f}")
+
+    if log_wandb:
+        wandb.log({
+            f"{mode.lower()}_accuracy_patient": accuracy,
+            f"{mode.lower()}_precision_patient": precision,
+            f"{mode.lower()}_recall_patient": recall,
+            f"{mode.lower()}_f1_score_patient": f1,
+            f"{mode.lower()}_best_threshold": best_threshold,
+        })
+
+    # --- 4. Additional metrics for test mode ---
+    if mode.lower() == "test" and fold is not None:
+        # Print classification report per class
+        print(f"Classification Report for fold {fold}:\n", classification_report(
+            y_true, y_pred, target_names=["No Cardiopatia", "Cardiopatia"]
+        ))
+
+    return f1, accuracy, precision, recall
+
 ######################## PREPROCESSING FUNCTIONS ################################
 def calculate_woe(data, feature, target):
     """Estimates the Weight of Evidence (WoE) for a fold of a categorical

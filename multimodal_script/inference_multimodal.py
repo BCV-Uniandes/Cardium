@@ -91,9 +91,9 @@ def main(args):
 
         # Inference
         y_true, y_score = inference_multimodal(multimodal_model, test_loader, device)
-        f1, accuracy, precision, recall = compute_patient_metrics(y_score=y_score, y_true=y_true, 
+        f1, accuracy, precision, recall = compute_patient_metrics_best_threshold(y_score=y_score, y_true=y_true, 
                                                                   mode="test", fold=fold, log_wandb=False)
-
+        
         # Store metrics for this fold
         metrics_folds["precision"].append(precision)
         metrics_folds["recall"].append(recall)
