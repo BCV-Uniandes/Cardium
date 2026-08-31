@@ -12,3 +12,5 @@ cardium_data_tar_files/
 README_CARDIUM.me
 cardium_images.tar.gz
 data/cardium_images.tar.gz
+cardium_model_weights.tar.gz
+image_encoder.tar.gz
